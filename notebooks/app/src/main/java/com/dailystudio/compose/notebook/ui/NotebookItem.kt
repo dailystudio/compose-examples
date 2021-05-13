@@ -1,22 +1,35 @@
 package com.dailystudio.compose.notebook.ui
 
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.material.Card
 import androidx.compose.material.Icon
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.rounded.Palette
+import androidx.compose.material.icons.rounded.Notes
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.constraintlayout.compose.ConstraintLayout
+import androidx.constraintlayout.compose.Dimension
 import com.dailystudio.compose.notebook.db.Notebook
 import com.dailystudio.compose.notebook.theme.NotesTheme
+
+@Composable
+fun Notebooks(notebooks: List<Notebook>?) {
+    notebooks?.let {
+        LazyColumn() {
+            items(notebooks) { nb ->
+                NotebookItem(notebook = nb)
+            }
+        }
+    }
+}
 
 @Composable
 fun NotebookItem(notebook: Notebook,
@@ -24,30 +37,54 @@ fun NotebookItem(notebook: Notebook,
 ) {
     Card(
         modifier = Modifier
-            .clickable {  }
-            .padding(10.dp)
+            .padding(8.dp)
+            .clickable { }
     ) {
-        Row(
+        ConstraintLayout(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(10.dp),
-            verticalAlignment = Alignment.CenterVertically
-
         ) {
+            val (icon, name, count) = createRefs()
+
             Icon(
-                imageVector = Icons.Rounded.Palette,
+                tint = MaterialTheme.colors.primary,
+                imageVector = Icons.Rounded.Notes,
                 contentDescription = null,
-                modifier = Modifier.padding(horizontal = 12.dp)
+                modifier = Modifier
+                    .constrainAs(icon) {
+                        start.linkTo(parent.start)
+                        centerVerticallyTo(parent)
+                    }
+                    .size(48.dp)
+                    .padding(horizontal = 8.dp)
             )
 
             Text(
                 text = notebook.name ?: "",
-                style = MaterialTheme.typography.h5,
+                color = MaterialTheme.colors.primary,
+                style = MaterialTheme.typography.subtitle1.copy(
+                    textAlign = TextAlign.Left
+                ),
+                modifier = Modifier
+                    .constrainAs(name) {
+                        start.linkTo(icon.end)
+                        end.linkTo(count.start)
+                        width = Dimension.fillToConstraints
+                        centerVerticallyTo(parent)
+                    }
             )
 
             Text(
                 text = notebook.notesCount.toString(),
-                style = MaterialTheme.typography.h6,
+                color = MaterialTheme.colors.primaryVariant,
+                style = MaterialTheme.typography.subtitle2,
+                modifier = Modifier
+                    .constrainAs(count) {
+                        end.linkTo(parent.end)
+                        centerVerticallyTo(parent)
+                    }
+                    .padding(horizontal = 8.dp)
             )
         }
     }
@@ -73,5 +110,20 @@ fun EmptyNotebookItemPreview() {
 
     NotesTheme() {
         NotebookItem(notebook)
+    }
+}
+
+
+@Preview
+@Composable
+fun NotebooksPreview() {
+    val notebooks = mutableListOf<Notebook>()
+
+    for (i in 0 until 100) {
+        notebooks.add(Notebook.createNoteBook("Notebook $i"))
+    }
+
+    NotesTheme() {
+        Notebooks(notebooks)
     }
 }

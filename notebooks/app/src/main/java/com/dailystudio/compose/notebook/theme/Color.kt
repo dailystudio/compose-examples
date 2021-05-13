@@ -1,21 +1,12 @@
-/*
- * Copyright 2020 The Android Open Source Project
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *     https://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
-package com.codelab.theming.ui.finish.theme
+package com.dailystudio.compose.notebook.theme
 
 import androidx.compose.ui.graphics.Color
 
-val Brown = Color(0xff503e4e)
+val primaryColor = Color(0xff503e4e)
+val primaryLightColor = Color(0xff7c697a)
+val primaryDarkColor = Color(0xff271826)
+val secondaryColor = Color(0xff616161)
+val secondaryLightColor = Color(0xff8e8e8e)
+val secondaryDarkColor = Color(0xff373737)
+val primaryTextColor = Color(0xffffffff)
+val secondaryTextColor = Color(0xffffffff)

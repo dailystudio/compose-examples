@@ -18,7 +18,7 @@ abstract class NotebookDaoExtension {
 */
 
     @Query("SELECT * FROM notebook ORDER BY last_modified DESC")
-    abstract fun getAllNotebooksOrderedByLastModifiedLivePaged(): Flow<List<Notebook>>
+    abstract fun getAllNotebooksOrderedByLastModified(): Flow<List<Notebook>>
 
 }
 

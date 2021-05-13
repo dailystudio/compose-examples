@@ -6,26 +6,25 @@ import androidx.compose.material.MaterialTheme
 import androidx.compose.material.darkColors
 import androidx.compose.material.lightColors
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.graphics.Color
-import com.codelab.theming.ui.finish.theme.Brown
 
 private val LightColors = lightColors(
-    primary = Brown,
-    primaryVariant = Brown,
-    onPrimary = Color.White,
-    secondary = Brown,
-    secondaryVariant = Brown,
-    onSecondary = Color.White,
-    error = Brown
+    primary = primaryColor,
+    primaryVariant = primaryLightColor,
+    onPrimary = primaryTextColor,
+    surface = primaryTextColor,
+    onSurface = primaryColor,
+    secondary = secondaryColor,
+    secondaryVariant = secondaryLightColor,
+    onSecondary = secondaryTextColor,
 )
 
 private val DarkColors = darkColors (
-    primary = Brown,
-    primaryVariant = Brown,
-    onPrimary = Color.Black,
-    secondary = Brown,
-    onSecondary = Color.Black,
-    error = Brown
+    primary = primaryColor,
+    primaryVariant = primaryDarkColor,
+    onPrimary = primaryTextColor,
+    secondary = secondaryColor,
+    secondaryVariant = secondaryDarkColor,
+    onSecondary = secondaryTextColor,
 )
 
 @Composable
