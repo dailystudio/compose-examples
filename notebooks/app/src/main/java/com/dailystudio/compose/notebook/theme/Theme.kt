@@ -34,6 +34,7 @@ fun NotesTheme(
 ) {
     MaterialTheme(
         colors = if (darkTheme) DarkColors else LightColors,
+        shapes = shapes,
         content = content
     )
 }

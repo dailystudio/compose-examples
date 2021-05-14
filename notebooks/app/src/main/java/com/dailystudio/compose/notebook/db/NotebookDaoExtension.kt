@@ -29,6 +29,9 @@ abstract class NoteDaoExtension {
     @Page(pageSize = 50)
     abstract fun getAllNotesOrderedByLastModifiedLivePaged(notebookId: Int): PagingSource<Int, Note>
 
+    @Query("SELECT * FROM note WHERE notebook_id = :notebookId ORDER BY last_modified DESC ")
+    abstract fun getAllNotesOrderedByLastModifiedLive(notebookId: Int): LiveData<List<Note>>
+
     @Query("SELECT COUNT(*) FROM note WHERE notebook_id = :notebookId")
     abstract fun countNotes(notebookId: Int): Int
 

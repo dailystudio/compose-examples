@@ -4,14 +4,17 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Card
 import androidx.compose.material.Icon
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.rounded.Article
 import androidx.compose.material.icons.rounded.Notes
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -21,11 +24,14 @@ import com.dailystudio.compose.notebook.db.Notebook
 import com.dailystudio.compose.notebook.theme.NotesTheme
 
 @Composable
-fun Notebooks(notebooks: List<Notebook>?) {
+fun Notebooks(notebooks: List<Notebook>?,
+              onOpenNotebook: (Notebook) -> Unit) {
     notebooks?.let {
-        LazyColumn() {
+        LazyColumn(modifier = Modifier
+            .padding(horizontal = 16.dp, vertical = 8.dp)
+        ) {
             items(notebooks) { nb ->
-                NotebookItem(notebook = nb)
+                NotebookItem(notebook = nb, onOpenNotebook)
             }
         }
     }
@@ -33,23 +39,26 @@ fun Notebooks(notebooks: List<Notebook>?) {
 
 @Composable
 fun NotebookItem(notebook: Notebook,
-                 modifier: Modifier = Modifier
+                 onItemClicked: (Notebook) -> Unit,
+                 modifier: Modifier = Modifier,
+
 ) {
     Card(
         modifier = Modifier
-            .padding(8.dp)
-            .clickable { }
+            .fillMaxWidth()
+            .padding(all = 8.dp),
+        elevation = 4.dp
     ) {
         ConstraintLayout(
             modifier = Modifier
-                .fillMaxWidth()
+                .clickable { onItemClicked(notebook) }
                 .padding(10.dp),
         ) {
             val (icon, name, count) = createRefs()
 
             Icon(
                 tint = MaterialTheme.colors.primary,
-                imageVector = Icons.Rounded.Notes,
+                imageVector = Icons.Rounded.Article,
                 contentDescription = null,
                 modifier = Modifier
                     .constrainAs(icon) {
@@ -99,7 +108,7 @@ fun NotebookItemPreview() {
     }
 
     NotesTheme() {
-        NotebookItem(notebook)
+        NotebookItem(notebook, {})
     }
 }
 
@@ -109,7 +118,7 @@ fun EmptyNotebookItemPreview() {
     val notebook = Notebook.createNoteBook("Empty")
 
     NotesTheme() {
-        NotebookItem(notebook)
+        NotebookItem(notebook, {})
     }
 }
 
@@ -124,6 +133,6 @@ fun NotebooksPreview() {
     }
 
     NotesTheme() {
-        Notebooks(notebooks)
+        Notebooks(notebooks) {}
     }
 }
