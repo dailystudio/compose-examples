@@ -1,4 +1,4 @@
 <resources>
     <string name="app_name_release">Notes</string>
-    <string name="app_name_debug">Notes (Debug)</string>
+    <string name="app_name_debug">@string/app_name_release</string>
 </resources>

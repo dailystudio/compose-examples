@@ -4,19 +4,37 @@ import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.*
-import androidx.compose.material.Card
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Text
+import androidx.compose.material.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.ViewModelProvider
 import com.dailystudio.compose.notebook.db.Note
+import com.dailystudio.compose.notebook.model.NoteViewModel
 import com.dailystudio.compose.notebook.theme.NotesTheme
 
+
+@ExperimentalFoundationApi
+@Composable
+fun NotesPage(notebookName: String,
+              notes: List<Note>?
+) {
+    Scaffold(
+        topBar = {
+            TopAppBar(title = {
+                Text(text = notebookName)
+            })
+        }
+    ) {
+        Notes(notes = notes)
+    }
+}
 
 @ExperimentalFoundationApi
 @Composable
