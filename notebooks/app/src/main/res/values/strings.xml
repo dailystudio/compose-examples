@@ -1,4 +1,8 @@
 <resources>
     <string name="app_name_release">Notes</string>
     <string name="app_name_debug">@string/app_name_release</string>
+
+    <string name="hint_title">Note Title</string>
+    <string name="hint_content">Start writing here …</string>
+
 </resources>

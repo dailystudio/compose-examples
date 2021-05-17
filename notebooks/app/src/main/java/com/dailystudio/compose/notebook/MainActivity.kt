@@ -7,8 +7,7 @@ import androidx.activity.viewModels
 import androidx.compose.animation.*
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.material.*
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
+import androidx.compose.runtime.*
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.NavType
@@ -25,6 +24,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.mapLatest
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import java.util.*
 
 class MainActivity : AppCompatActivity() {
@@ -78,7 +78,41 @@ class MainActivity : AppCompatActivity() {
                         if (notebookId != null && notebookName != null) {
                             val notes by noteViewModel.getAllNotesOrderedByLastModifiedLive(notebookId)
                                 .observeAsState()
-                            NotesPage(notebookName, notes)
+                            NotesPage(notebookName, notes) {
+                                navController.navigate("note/${it.id}") {
+                                    launchSingleTop = true
+                                }
+                            }
+                        }
+                    }
+                    composable("note/{noteId}",
+                        arguments = listOf(
+                            navArgument("noteId") {
+                                type = NavType.IntType
+                            }
+                        )
+                    ) { backStackEntry ->
+                        val noteId = backStackEntry.arguments?.getInt("noteId")
+
+                        var note by remember { mutableStateOf( Note.createNote() ) }
+                        LaunchedEffect(key1 = noteId) {
+                            launch(Dispatchers.IO) {
+                                if (noteId != null) {
+                                    val noteById = noteViewModel.getNote(noteId)
+                                    Logger.debug("noteById: $noteById")
+
+                                    noteById?.let { note = it }
+                                }
+                            }
+                        }
+
+                        Logger.debug("use note: $note")
+                        NoteEditScreen(note) {
+                            Logger.debug("update note: $it")
+
+                            noteViewModel.updateNote(it)
+
+                            navController.popBackStack()
                         }
                     }
                 }

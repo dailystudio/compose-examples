@@ -16,6 +16,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.ViewModelProvider
 import com.dailystudio.compose.notebook.db.Note
+import com.dailystudio.compose.notebook.db.Notebook
 import com.dailystudio.compose.notebook.model.NoteViewModel
 import com.dailystudio.compose.notebook.theme.NotesTheme
 
@@ -23,7 +24,8 @@ import com.dailystudio.compose.notebook.theme.NotesTheme
 @ExperimentalFoundationApi
 @Composable
 fun NotesPage(notebookName: String,
-              notes: List<Note>?
+              notes: List<Note>?,
+              onEditNote: (Note) -> Unit
 ) {
     Scaffold(
         topBar = {
@@ -32,13 +34,15 @@ fun NotesPage(notebookName: String,
             })
         }
     ) {
-        Notes(notes = notes)
+        Notes(notes = notes, onEditNote)
     }
 }
 
 @ExperimentalFoundationApi
 @Composable
-fun Notes(notes: List<Note>?) {
+fun Notes(notes: List<Note>?,
+          onEditNote: (Note) -> Unit
+) {
     notes?.let {
         LazyVerticalGrid(
             cells = GridCells.Fixed(2),
@@ -46,7 +50,7 @@ fun Notes(notes: List<Note>?) {
                 .padding(horizontal = 16.dp, vertical = 8.dp)
         ) {
             items(notes) { note ->
-                NoteItem(note = note)
+                NoteItem(note = note, onEditNote)
             }
         }
     }
@@ -55,6 +59,7 @@ fun Notes(notes: List<Note>?) {
 
 @Composable
 fun NoteItem(note: Note,
+             onItemClicked: (Note) -> Unit,
              modifier: Modifier = Modifier
 ) {
     Card(
@@ -64,10 +69,10 @@ fun NoteItem(note: Note,
     ) {
         Column(
             modifier = Modifier
-                .clickable { }
+                .clickable { onItemClicked(note) }
                 .fillMaxWidth()
                 .height(180.dp)
-                .padding(10.dp),
+                .padding(16.dp),
         ) {
             Text(
                 text = note.title ?: "",
@@ -81,7 +86,7 @@ fun NoteItem(note: Note,
                 overflow = TextOverflow.Clip,
                 maxLines = 6,
                 color = Color.Gray,
-                style = MaterialTheme.typography.h6.copy(
+                style = MaterialTheme.typography.body2.copy(
                     textAlign = TextAlign.Left
                 ),
             )
@@ -97,7 +102,7 @@ fun NoteItemPreview() {
     val note = Note.createNote(0, "Note 1", "Blablabla")
 
     NotesTheme() {
-        NoteItem(note)
+        NoteItem(note, {})
     }
 }
 
@@ -107,7 +112,7 @@ fun EmptyNoteItemPreview() {
     val note = Note.createNote(0, "Note Empty", null)
 
     NotesTheme() {
-        NoteItem(note)
+        NoteItem(note, {})
     }
 }
 
@@ -125,6 +130,6 @@ fun NotesPreview() {
     }
 
     NotesTheme() {
-        Notes(notes)
+        Notes(notes, {})
     }
 }

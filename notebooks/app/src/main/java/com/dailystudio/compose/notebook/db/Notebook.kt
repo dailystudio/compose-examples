@@ -55,9 +55,9 @@ class Note(id: Int = 0) : SelectableRecord(id) {
 
     companion object {
 
-        fun createNote(notebookId: Int,
-                       title: String?,
-                       desc: String?): Note {
+        fun createNote(notebookId: Int = -1,
+                       title: String? = null,
+                       desc: String? = null): Note {
             return Note(0).apply {
                 val now = System.currentTimeMillis()
 
@@ -66,6 +66,17 @@ class Note(id: Int = 0) : SelectableRecord(id) {
                 this.desc = desc
                 this.created = Date(now)
                 this.lastModified = this.created
+            }
+        }
+
+        fun copyNote(note: Note): Note {
+            return Note(note.id).apply {
+                notebook_id = note.notebook_id
+                title = note.title
+                desc = note.desc
+                created = note.created
+                lastModified = note.lastModified
+                selected = note.selected
             }
         }
 
