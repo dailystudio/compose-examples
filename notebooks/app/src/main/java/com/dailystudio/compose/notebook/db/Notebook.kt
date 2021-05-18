@@ -13,7 +13,7 @@ import java.util.*
     extension = NotebookDaoExtension::class,
     database = "notes",
 )
-@ViewModel
+@ViewModel(group = "notebook")
 open class Notebook(id: Int = 0) : SelectableRecord(id) {
 
     companion object {
@@ -50,7 +50,7 @@ open class Notebook(id: Int = 0) : SelectableRecord(id) {
         onDelete = ForeignKey.CASCADE
     )]
 )
-@ViewModel
+@ViewModel(group = "notebook")
 class Note(id: Int = 0) : SelectableRecord(id) {
 
     companion object {

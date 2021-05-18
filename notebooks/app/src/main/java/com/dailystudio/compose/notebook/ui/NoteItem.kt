@@ -5,19 +5,16 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.*
 import androidx.compose.material.*
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Create
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.ViewModelProvider
 import com.dailystudio.compose.notebook.db.Note
-import com.dailystudio.compose.notebook.db.Notebook
-import com.dailystudio.compose.notebook.model.NoteViewModel
 import com.dailystudio.compose.notebook.theme.NotesTheme
 
 
@@ -32,6 +29,11 @@ fun NotesPage(notebookName: String,
             TopAppBar(title = {
                 Text(text = notebookName)
             })
+        },
+        floatingActionButton = {
+            FloatingActionButton(onClick = { /*TODO*/ }) {
+                Icon(Icons.Filled.Create, contentDescription = null)
+            }
         }
     ) {
         Notes(notes = notes, onEditNote)
