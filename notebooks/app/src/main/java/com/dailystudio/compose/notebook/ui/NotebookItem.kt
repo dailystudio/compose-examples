@@ -2,12 +2,14 @@ package com.dailystudio.compose.notebook.ui
 
 import android.view.LayoutInflater
 import androidx.compose.animation.ExperimentalAnimationApi
+import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
@@ -16,15 +18,11 @@ import androidx.compose.material.icons.rounded.Article
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.focus.focusModifier
-import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.viewinterop.AndroidView
-import androidx.compose.ui.window.Dialog
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.constraintlayout.compose.Dimension
 import com.dailystudio.compose.notebook.R
@@ -118,12 +116,29 @@ fun NotebooksPage(notebooks: List<Notebook>?,
 @Composable
 fun Notebooks(notebooks: List<Notebook>?,
               onOpenNotebook: (Notebook) -> Unit) {
+
+    val listState = rememberLazyListState()
+    val selectedIndexes = remember{ mutableStateMapOf<Int, Boolean>() }
+
     notebooks?.let {
         LazyColumn(modifier = Modifier
-            .padding(horizontal = 16.dp, vertical = 8.dp)
+            .padding(horizontal = 16.dp, vertical = 8.dp),
+            state = listState
         ) {
             items(notebooks) { nb ->
-                NotebookItem(notebook = nb, onOpenNotebook)
+                NotebookItem(
+                    notebook = nb,
+                    selectedIndexes.containsKey(nb.id),
+                    onSelected = {
+                        val selected =
+                            selectedIndexes.containsKey(nb.id)
+                        if (selected) {
+                            selectedIndexes.remove(nb.id)
+                        } else {
+                            selectedIndexes[nb.id] = true
+                        }
+                     },
+                    onOpenNotebook)
             }
         }
     }
@@ -175,6 +190,8 @@ fun NewNotebookDialog(showDialog: Boolean,
 
 @Composable
 fun NotebookItem(notebook: Notebook,
+                 selected: Boolean,
+                 onSelected: (Int) -> Unit,
                  onItemClicked: (Notebook) -> Unit,
                  modifier: Modifier = Modifier,
 
@@ -182,27 +199,30 @@ fun NotebookItem(notebook: Notebook,
     Card(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(all = 8.dp),
+            .padding(all = 8.dp)
+        ,
         elevation = 4.dp
     ) {
         ConstraintLayout(
             modifier = Modifier
-                .clickable { onItemClicked(notebook) }
-                .padding(10.dp),
+                .clickable {
+//                    onItemClicked(notebook)
+                    onSelected(notebook.id)
+                }
         ) {
-            val (icon, name, count) = createRefs()
+            val (icon, name, count, indicator) = createRefs()
 
             Icon(
                 tint = MaterialTheme.colors.primary,
                 imageVector = Icons.Rounded.Article,
                 contentDescription = null,
                 modifier = Modifier
+                    .padding(horizontal = 8.dp, vertical = 10.dp)
                     .constrainAs(icon) {
                         start.linkTo(parent.start)
                         centerVerticallyTo(parent)
                     }
-                    .size(48.dp)
-                    .padding(horizontal = 8.dp)
+                    .size(44.dp)
             )
 
             Text(
@@ -226,12 +246,31 @@ fun NotebookItem(notebook: Notebook,
                 style = MaterialTheme.typography.subtitle2,
                 modifier = Modifier
                     .constrainAs(count) {
-                        end.linkTo(parent.end)
+                        end.linkTo(parent.end, margin = 10.dp)
                         centerVerticallyTo(parent)
                     }
-                    .padding(horizontal = 8.dp)
             )
+
+
+            if (selected) {
+                val indicatorColor = MaterialTheme.colors.primary
+                Canvas(
+                    modifier = Modifier
+                        .constrainAs(indicator) {
+                            start.linkTo(parent.start)
+                            top.linkTo(parent.top)
+                            bottom.linkTo(parent.bottom)
+
+                            height = Dimension.fillToConstraints
+                        }
+                        .width(8.dp)
+
+                ) {
+                    drawRect(indicatorColor, size = size)
+                }
+            }
         }
+
     }
 
 }
@@ -244,7 +283,19 @@ fun NotebookItemPreview() {
     }
 
     NotesTheme() {
-        NotebookItem(notebook, {})
+        NotebookItem(notebook, false, {}, {})
+    }
+}
+
+@Preview
+@Composable
+fun SelectedNotebookItemPreview() {
+    val notebook = Notebook.createNoteBook("Notebook").apply {
+        notesCount = 10
+    }
+
+    NotesTheme() {
+        NotebookItem(notebook, true, {}, {})
     }
 }
 
@@ -254,7 +305,7 @@ fun EmptyNotebookItemPreview() {
     val notebook = Notebook.createNoteBook("Empty")
 
     NotesTheme() {
-        NotebookItem(notebook, {})
+        NotebookItem(notebook, false, {}, {})
     }
 }
 
