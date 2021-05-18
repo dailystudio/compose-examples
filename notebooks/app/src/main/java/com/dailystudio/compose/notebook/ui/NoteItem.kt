@@ -7,6 +7,7 @@ import androidx.compose.foundation.lazy.*
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Create
+import androidx.compose.material.icons.filled.Menu
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -28,9 +29,11 @@ fun NotesPage(notebookId: Int,
 ) {
     Scaffold(
         topBar = {
-            TopAppBar(title = {
-                Text(text = notebookName)
-            })
+            TopAppBar(
+                title = {
+                    Text(text = notebookName)
+                },
+            )
         },
         floatingActionButton = {
             FloatingActionButton(
@@ -40,7 +43,7 @@ fun NotesPage(notebookId: Int,
             ) {
                 Icon(Icons.Filled.Create, contentDescription = null)
             }
-        }
+        },
     ) {
         Notes(notes = notes, onEditNote)
     }

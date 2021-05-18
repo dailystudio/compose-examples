@@ -1,20 +1,30 @@
 package com.dailystudio.compose.notebook.ui
 
+import android.view.LayoutInflater
 import androidx.compose.animation.ExperimentalAnimationApi
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.*
 import androidx.compose.material.icons.rounded.Article
 import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.focus.focusModifier
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.viewinterop.AndroidView
+import androidx.compose.ui.window.Dialog
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.constraintlayout.compose.Dimension
 import com.dailystudio.compose.notebook.R
@@ -28,15 +38,50 @@ fun NotebooksPage(notebooks: List<Notebook>?,
                   onOpenNotebook: (Notebook) -> Unit,
                   onNewNotebook: (Notebook) -> Unit
 ) {
+    var showMenu by remember { mutableStateOf(false) }
+
+    var showAboutDialog by remember {
+        mutableStateOf(false)
+    }
+
     var showNewNoteDialog by remember {
         mutableStateOf(false)
     }
 
     Scaffold(
         topBar = {
-            TopAppBar(title = {
-                Text(text = stringResource(R.string.app_name))
-            })
+            TopAppBar(
+                title = {
+                    Text(text = stringResource(R.string.app_name))
+                },
+                actions = {
+                    IconButton(onClick = {
+                        showMenu = true
+                    }) {
+                        Icon(Icons.Default.MoreVert, "More actions")
+                    }
+                    DropdownMenu(
+                        expanded = showMenu,
+                        onDismissRequest = { showMenu = false }
+                    ) {
+                        DropdownMenuItem(onClick = {
+                            showAboutDialog = true
+                            showMenu = false
+                        }) {
+                            Row(
+                                verticalAlignment = Alignment.CenterVertically,
+                                modifier = Modifier.widthIn(min = 100.dp)
+                            ) {
+                                Icon(Icons.Filled.Info,
+                                    contentDescription = null,
+                                    modifier = Modifier.padding(8.dp)
+                                )
+                                Text(stringResource(id = R.string.menu_about))
+                            }
+                        }
+                    }
+                }
+            )
         },
         floatingActionButton = {
             FloatingActionButton(onClick = {
@@ -50,6 +95,10 @@ fun NotebooksPage(notebooks: List<Notebook>?,
         Notebooks(notebooks = notebooks) {
             Logger.debug("open notebook: $it")
             onOpenNotebook(it)
+        }
+
+        AboutDialog(showDialog = showAboutDialog) {
+            showAboutDialog = false
         }
 
         NewNotebookDialog(
@@ -122,6 +171,7 @@ fun NewNotebookDialog(showDialog: Boolean,
         )
     }
 }
+
 
 @Composable
 fun NotebookItem(notebook: Notebook,
