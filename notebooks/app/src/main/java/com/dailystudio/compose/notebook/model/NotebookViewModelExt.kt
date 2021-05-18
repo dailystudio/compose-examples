@@ -9,6 +9,7 @@ import com.dailystudio.compose.notebook.db.Note
 import com.dailystudio.compose.notebook.db.Notebook
 import com.dailystudio.devbricksx.development.Logger
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.mapLatest
 import kotlinx.coroutines.launch
@@ -37,7 +38,7 @@ class NotebookViewModelExt(application: Application): NotebookViewModel(applicat
 
     val currentNote: LiveData<Note> = _currentNote
 
-    val notesInOpenedNotebook: LiveData<List<Note>>
+    val notesInOpenedNotebook: Flow<List<Note>>
         get () {
             return getAllNotesOrderedByLastModifiedLive(currentNotebookId)
         }

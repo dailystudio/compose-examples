@@ -1,6 +1,5 @@
 package com.dailystudio.compose.notebook.ui
 
-import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -22,12 +21,17 @@ import com.dailystudio.compose.notebook.R
 import com.dailystudio.compose.notebook.db.Notebook
 import com.dailystudio.compose.notebook.theme.NotesTheme
 import com.dailystudio.devbricksx.development.Logger
-import kotlinx.coroutines.delay
 
 @ExperimentalAnimationApi
 @Composable
 fun NotebooksPage(notebooks: List<Notebook>?,
-                  onOpenNotebook: (Notebook) -> Unit) {
+                  onOpenNotebook: (Notebook) -> Unit,
+                  onNewNotebook: (Notebook) -> Unit
+) {
+    var showNewNoteDialog by remember {
+        mutableStateOf(false)
+    }
+
     Scaffold(
         topBar = {
             TopAppBar(title = {
@@ -35,7 +39,9 @@ fun NotebooksPage(notebooks: List<Notebook>?,
             })
         },
         floatingActionButton = {
-            FloatingActionButton(onClick = { /*TODO*/ }) {
+            FloatingActionButton(onClick = {
+                showNewNoteDialog = true
+            }) {
                 Icon(Icons.Filled.Add, contentDescription = null)
             }
         }
@@ -45,6 +51,18 @@ fun NotebooksPage(notebooks: List<Notebook>?,
             Logger.debug("open notebook: $it")
             onOpenNotebook(it)
         }
+
+        NewNotebookDialog(
+            showDialog = showNewNoteDialog,
+            onCancel = { showNewNoteDialog = false},
+            onNewNotebook = {
+                showNewNoteDialog = false
+
+                val newNotebook = Notebook.createNoteBook(it)
+
+                onNewNotebook(newNotebook)
+            }
+        )
     }
 }
 
@@ -59,6 +77,49 @@ fun Notebooks(notebooks: List<Notebook>?,
                 NotebookItem(notebook = nb, onOpenNotebook)
             }
         }
+    }
+}
+
+@Composable
+fun NewNotebookDialog(showDialog: Boolean,
+                      onCancel: () -> Unit,
+                      onNewNotebook: (String) -> Unit
+) {
+    var notebookName by remember {
+        mutableStateOf("")
+    }
+
+    if (showDialog) {
+        AlertDialog(
+            onDismissRequest = {
+            },
+
+            title = {
+                Text(text = stringResource(id = R.string.dialog_title_new_notebook))
+            },
+            text = {
+                TextField(value = notebookName,
+                    onValueChange = {
+                        notebookName = it
+                    }
+                )
+            },
+            dismissButton = {
+                Button(onClick = {
+                    onCancel()
+                }) {
+                    Text(stringResource(id = android.R.string.cancel))
+                }
+            },
+            confirmButton = {
+                Button(onClick = {
+                    onNewNotebook(notebookName)
+                    notebookName = ""
+                }) {
+                    Text(stringResource(id = android.R.string.ok))
+                }
+            }
+        )
     }
 }
 

@@ -19,7 +19,7 @@ fun Home() {
     val notebookViewModel = viewModel<NotebookViewModelExt>()
 
     val notebooks by notebookViewModel.allNotebooks.collectAsState(initial = null)
-    val notes by notebookViewModel.notesInOpenedNotebook.observeAsState()
+    val notes by notebookViewModel.notesInOpenedNotebook.collectAsState(initial = null)
     val note by notebookViewModel.currentNote.observeAsState(Note.createNote(-1))
 
     navController.addOnDestinationChangedListener { _, _, arguments ->
@@ -39,11 +39,16 @@ fun Home() {
         composable("notebooks") {
             notebookViewModel.closeNotebook()
 
-            NotebooksPage(notebooks) {
-                notebookViewModel.openNotebook(it.id)
+            NotebooksPage(notebooks,
+                onOpenNotebook = {
+                    notebookViewModel.openNotebook(it.id)
 
-                navController.navigate("notes/${it.id}?notebookName=${it.name}")
-            }
+                    navController.navigate("notes/${it.id}?notebookName=${it.name}")
+                },
+                onNewNotebook = {
+                    notebookViewModel.insertNotebook(it)
+                }
+            )
         }
         composable("notes/{notebookId}?notebookName={notebookName}",
             arguments = listOf(
