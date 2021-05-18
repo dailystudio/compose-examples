@@ -20,9 +20,11 @@ import com.dailystudio.compose.notebook.theme.NotesTheme
 
 @ExperimentalFoundationApi
 @Composable
-fun NotesPage(notebookName: String,
+fun NotesPage(notebookId: Int,
+              notebookName: String,
               notes: List<Note>?,
-              onEditNote: (Note) -> Unit
+              onEditNote: (Note) -> Unit,
+              onNewNote: () -> Unit
 ) {
     Scaffold(
         topBar = {
@@ -31,7 +33,11 @@ fun NotesPage(notebookName: String,
             })
         },
         floatingActionButton = {
-            FloatingActionButton(onClick = { /*TODO*/ }) {
+            FloatingActionButton(
+                onClick = {
+                    onNewNote()
+                }
+            ) {
                 Icon(Icons.Filled.Create, contentDescription = null)
             }
         }
