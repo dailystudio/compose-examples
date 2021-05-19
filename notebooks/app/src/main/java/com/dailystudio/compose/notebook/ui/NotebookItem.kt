@@ -2,10 +2,10 @@ package com.dailystudio.compose.notebook.ui
 
 import android.view.LayoutInflater
 import androidx.compose.animation.ExperimentalAnimationApi
-import androidx.compose.foundation.Canvas
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
+import androidx.compose.foundation.*
+import androidx.compose.foundation.interaction.Interaction
+import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.interaction.PressInteraction
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -15,9 +15,11 @@ import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material.icons.rounded.Article
+import androidx.compose.material.ripple.rememberRipple
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
@@ -30,6 +32,7 @@ import com.dailystudio.compose.notebook.db.Notebook
 import com.dailystudio.compose.notebook.theme.NotesTheme
 import com.dailystudio.devbricksx.development.Logger
 
+@ExperimentalFoundationApi
 @ExperimentalAnimationApi
 @Composable
 fun NotebooksPage(notebooks: List<Notebook>?,
@@ -113,12 +116,14 @@ fun NotebooksPage(notebooks: List<Notebook>?,
     }
 }
 
+@ExperimentalFoundationApi
 @Composable
 fun Notebooks(notebooks: List<Notebook>?,
               onOpenNotebook: (Notebook) -> Unit) {
 
     val listState = rememberLazyListState()
     val selectedIndexes = remember{ mutableStateMapOf<Int, Boolean>() }
+    var selectionEnabled by remember{ mutableStateOf(false) }
 
     notebooks?.let {
         LazyColumn(modifier = Modifier
@@ -128,6 +133,7 @@ fun Notebooks(notebooks: List<Notebook>?,
             items(notebooks) { nb ->
                 NotebookItem(
                     notebook = nb,
+                    selectable = selectionEnabled,
                     selectedIndexes.containsKey(nb.id),
                     onSelected = {
                         val selected =
@@ -137,8 +143,14 @@ fun Notebooks(notebooks: List<Notebook>?,
                         } else {
                             selectedIndexes[nb.id] = true
                         }
-                     },
-                    onOpenNotebook)
+                    },
+                    onItemLongClicked = {
+                        if (!selectionEnabled) {
+                            selectionEnabled = true
+                            selectedIndexes[nb.id] = true
+                        }
+                    },
+                    onItemClicked = onOpenNotebook)
             }
         }
     }
@@ -188,14 +200,20 @@ fun NewNotebookDialog(showDialog: Boolean,
 }
 
 
+@ExperimentalFoundationApi
 @Composable
-fun NotebookItem(notebook: Notebook,
-                 selected: Boolean,
-                 onSelected: (Int) -> Unit,
-                 onItemClicked: (Notebook) -> Unit,
-                 modifier: Modifier = Modifier,
+fun NotebookItem(
+    notebook: Notebook,
+    selectable: Boolean = false,
+    selected: Boolean,
+    onSelected: (Int) -> Unit,
+    onItemClicked: (Notebook) -> Unit,
+    onItemLongClicked: (Notebook) -> Unit = {},
+    modifier: Modifier = Modifier,
 
-) {
+    ) {
+    val interactionSource = remember { MutableInteractionSource() }
+
     Card(
         modifier = Modifier
             .fillMaxWidth()
@@ -205,10 +223,21 @@ fun NotebookItem(notebook: Notebook,
     ) {
         ConstraintLayout(
             modifier = Modifier
-                .clickable {
-//                    onItemClicked(notebook)
-                    onSelected(notebook.id)
-                }
+                .combinedClickable(
+                    interactionSource = interactionSource,
+                    indication = rememberRipple(),
+                    onClick = {
+                        if (selectable) {
+                            onSelected(notebook.id)
+                        } else {
+                            onItemClicked(notebook)
+                        }
+                    },
+                    onLongClick = {
+                        onItemLongClicked(notebook)
+                        interactionSource.tryEmit(PressInteraction.Release(PressInteraction.Press(Offset.Zero)))
+                    }
+                )
         ) {
             val (icon, name, count, indicator) = createRefs()
 
@@ -276,6 +305,7 @@ fun NotebookItem(notebook: Notebook,
 }
 
 @Preview
+@ExperimentalFoundationApi
 @Composable
 fun NotebookItemPreview() {
     val notebook = Notebook.createNoteBook("Notebook").apply {
@@ -283,11 +313,12 @@ fun NotebookItemPreview() {
     }
 
     NotesTheme() {
-        NotebookItem(notebook, false, {}, {})
+        NotebookItem(notebook, selectable = true, selected = false, {}, {}, {})
     }
 }
 
 @Preview
+@ExperimentalFoundationApi
 @Composable
 fun SelectedNotebookItemPreview() {
     val notebook = Notebook.createNoteBook("Notebook").apply {
@@ -295,22 +326,23 @@ fun SelectedNotebookItemPreview() {
     }
 
     NotesTheme() {
-        NotebookItem(notebook, true, {}, {})
+        NotebookItem(notebook, selectable = true, selected = true, {}, {}, {})
     }
 }
 
 @Preview
+@ExperimentalFoundationApi
 @Composable
 fun EmptyNotebookItemPreview() {
     val notebook = Notebook.createNoteBook("Empty")
 
     NotesTheme() {
-        NotebookItem(notebook, false, {}, {})
+        NotebookItem(notebook, selectable = true, selected = false, {}, {}, {})
     }
 }
 
-
 @Preview
+@ExperimentalFoundationApi
 @Composable
 fun NotebooksPreview() {
     val notebooks = mutableListOf<Notebook>()
