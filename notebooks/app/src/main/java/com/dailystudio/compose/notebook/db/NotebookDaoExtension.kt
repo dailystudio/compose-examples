@@ -7,7 +7,7 @@ import kotlinx.coroutines.flow.Flow
 @DaoExtension(entity = Notebook::class)
 abstract class NotebookDaoExtension {
 
-    @Query("SELECT * FROM notebook ORDER BY last_modified DESC")
+    @Query("SELECT notebook.id, notebook.name, notebook.created, notebook.last_modified, count(note.id) as notesCount FROM notebook LEFT OUTER JOIN note ON note.notebook_id = notebook.id GROUP BY notebook.id ORDER BY notebook.last_modified DESC")
     abstract fun getAllNotebooksOrderedByLastModified(): Flow<List<Notebook>>
 
     @Query("DELETE FROM notebook WHERE id IN (:ids)")

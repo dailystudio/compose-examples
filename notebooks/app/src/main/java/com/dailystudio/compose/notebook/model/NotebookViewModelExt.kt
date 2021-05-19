@@ -28,6 +28,7 @@ class NotebookViewModelExt(application: Application): NotebookViewModel(applicat
                     val wrapper = mutableListOf<Notebook>()
 
                     for (notebook in notebooks) {
+                        Logger.debug("queried notebook: $notebook")
                         notebook.notesCount = countNotes(notebook.id)
                         Logger.debug("nc: ${notebook.notesCount} of $notebook")
 
