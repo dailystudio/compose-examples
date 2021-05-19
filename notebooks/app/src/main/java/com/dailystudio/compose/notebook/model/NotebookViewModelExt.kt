@@ -9,6 +9,7 @@ import com.dailystudio.compose.notebook.db.Note
 import com.dailystudio.compose.notebook.db.Notebook
 import com.dailystudio.devbricksx.development.Logger
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.mapLatest
@@ -71,5 +72,15 @@ class NotebookViewModelExt(application: Application): NotebookViewModel(applicat
         currentNoteId = -1
         _currentNote.postValue(Note.createNote(currentNotebookId))
     }
+
+    fun deleteNotes(ids: Set<Int>): Job =
+        viewModelScope.launch(Dispatchers.IO) {
+            noteRepository.deleteNotes(ids.toIntArray())
+        }
+
+    fun deleteNotebooks(ids: Set<Int>): Job =
+        viewModelScope.launch(Dispatchers.IO) {
+            notebookRepository.deleteNotebooks(ids.toIntArray())
+        }
 
 }

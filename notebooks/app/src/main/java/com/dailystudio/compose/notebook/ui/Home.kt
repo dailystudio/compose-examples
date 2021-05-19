@@ -47,6 +47,9 @@ fun Home() {
                 },
                 onNewNotebook = {
                     notebookViewModel.insertNotebook(it)
+                },
+                onRemoveNotebooks = {
+                    notebookViewModel.deleteNotebooks(it)
                 }
             )
         }
@@ -70,6 +73,9 @@ fun Home() {
                     },
                     onNewNote = {
                         navController.navigate("note/new/${notebookId}")
+                    },
+                    onRemoveNotes = {
+                        notebookViewModel.deleteNotes(it)
                     }
                 )
             }

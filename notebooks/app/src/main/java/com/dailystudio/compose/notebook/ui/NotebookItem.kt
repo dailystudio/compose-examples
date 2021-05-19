@@ -1,16 +1,13 @@
 package com.dailystudio.compose.notebook.ui
 
-import android.view.LayoutInflater
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.foundation.*
-import androidx.compose.foundation.interaction.Interaction
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.PressInteraction
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
@@ -20,7 +17,6 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
@@ -37,8 +33,17 @@ import com.dailystudio.devbricksx.development.Logger
 @Composable
 fun NotebooksPage(notebooks: List<Notebook>?,
                   onOpenNotebook: (Notebook) -> Unit,
-                  onNewNotebook: (Notebook) -> Unit
+                  onNewNotebook: (Notebook) -> Unit,
+                  onRemoveNotebooks: (Set<Int>) -> Unit,
 ) {
+    var inSelectionMode by remember {
+        mutableStateOf(false)
+    }
+
+    val selectedItems = remember {
+        mutableStateMapOf<Int, Boolean>()
+    }
+
     var showMenu by remember { mutableStateOf(false) }
 
     var showAboutDialog by remember {
@@ -51,38 +56,61 @@ fun NotebooksPage(notebooks: List<Notebook>?,
 
     Scaffold(
         topBar = {
-            TopAppBar(
-                title = {
-                    Text(text = stringResource(R.string.app_name))
-                },
-                actions = {
-                    IconButton(onClick = {
-                        showMenu = true
-                    }) {
-                        Icon(Icons.Default.MoreVert, "More actions")
-                    }
-                    DropdownMenu(
-                        expanded = showMenu,
-                        onDismissRequest = { showMenu = false }
-                    ) {
-                        DropdownMenuItem(onClick = {
-                            showAboutDialog = true
-                            showMenu = false
+            if (inSelectionMode) {
+                TopAppBar(
+                    title = {
+                        Text(text = stringResource(
+                            R.string.prompt_selection,
+                            selectedItems.size
+                        ))
+                    },
+                    actions = {
+                        IconButton(onClick = {
+                            onRemoveNotebooks(selectedItems.keys.toSet())
+
+                            selectedItems.clear()
+                            inSelectionMode = false
                         }) {
-                            Row(
-                                verticalAlignment = Alignment.CenterVertically,
-                                modifier = Modifier.widthIn(min = 100.dp)
-                            ) {
-                                Icon(Icons.Filled.Info,
-                                    contentDescription = null,
-                                    modifier = Modifier.padding(8.dp)
-                                )
-                                Text(stringResource(id = R.string.menu_about))
+                            Icon(Icons.Default.Delete, "Delete")
+                        }
+
+                    }
+                )
+            } else {
+                TopAppBar(
+                    title = {
+                        Text(text = stringResource(R.string.app_name))
+                    },
+                    actions = {
+                        IconButton(onClick = {
+                            showMenu = true
+                        }) {
+                            Icon(Icons.Default.MoreVert, "More actions")
+                        }
+                        DropdownMenu(
+                            expanded = showMenu,
+                            onDismissRequest = { showMenu = false }
+                        ) {
+                            DropdownMenuItem(onClick = {
+                                showAboutDialog = true
+                                showMenu = false
+                            }) {
+                                Row(
+                                    verticalAlignment = Alignment.CenterVertically,
+                                    modifier = Modifier.widthIn(min = 100.dp)
+                                ) {
+                                    Icon(Icons.Filled.Info,
+                                        contentDescription = null,
+                                        modifier = Modifier.padding(8.dp)
+                                    )
+                                    Text(stringResource(id = R.string.menu_about))
+                                }
                             }
                         }
                     }
-                }
-            )
+                )
+            }
+
         },
         floatingActionButton = {
             FloatingActionButton(onClick = {
@@ -93,10 +121,32 @@ fun NotebooksPage(notebooks: List<Notebook>?,
         }
     
     ) {
-        Notebooks(notebooks = notebooks) {
-            Logger.debug("open notebook: $it")
-            onOpenNotebook(it)
-        }
+        Logger.debug("recomposition: selectable $inSelectionMode")
+        Notebooks(notebooks = notebooks,
+            selectable = inSelectionMode,
+            selectedItems = selectedItems.keys,
+            onOpenNotebook = {
+                Logger.debug("open notebook: $it")
+                onOpenNotebook(it)
+            },
+            onSelectNotebook = {
+                Logger.debug("on selected: $it")
+                val selected =
+                    selectedItems.containsKey(it.id)
+                if (selected) {
+                    selectedItems.remove(it.id)
+                } else {
+                    selectedItems[it.id] = true
+                }
+
+                Logger.debug("after selected: $selectedItems")
+
+            },
+            onSelectionStarted = {
+                inSelectionMode = true
+                selectedItems[it.id] = true
+            }
+        )
 
         AboutDialog(showDialog = showAboutDialog) {
             showAboutDialog = false
@@ -119,11 +169,14 @@ fun NotebooksPage(notebooks: List<Notebook>?,
 @ExperimentalFoundationApi
 @Composable
 fun Notebooks(notebooks: List<Notebook>?,
-              onOpenNotebook: (Notebook) -> Unit) {
+              selectable: Boolean,
+              selectedItems: Set<Int>,
+              onOpenNotebook: (Notebook) -> Unit,
+              onSelectionStarted: (Notebook) -> Unit,
+              onSelectNotebook: (Notebook) -> Unit,
+) {
 
     val listState = rememberLazyListState()
-    val selectedIndexes = remember{ mutableStateMapOf<Int, Boolean>() }
-    var selectionEnabled by remember{ mutableStateOf(false) }
 
     notebooks?.let {
         LazyColumn(modifier = Modifier
@@ -133,21 +186,14 @@ fun Notebooks(notebooks: List<Notebook>?,
             items(notebooks) { nb ->
                 NotebookItem(
                     notebook = nb,
-                    selectable = selectionEnabled,
-                    selectedIndexes.containsKey(nb.id),
-                    onSelected = {
-                        val selected =
-                            selectedIndexes.containsKey(nb.id)
-                        if (selected) {
-                            selectedIndexes.remove(nb.id)
-                        } else {
-                            selectedIndexes[nb.id] = true
-                        }
+                    selectable = selectable,
+                    selectedItems.contains(nb.id),
+                    onItemSelected = {
+                        onSelectNotebook(it)
                     },
                     onItemLongClicked = {
-                        if (!selectionEnabled) {
-                            selectionEnabled = true
-                            selectedIndexes[nb.id] = true
+                        if (!selectable) {
+                            onSelectionStarted(it)
                         }
                     },
                     onItemClicked = onOpenNotebook)
@@ -206,7 +252,7 @@ fun NotebookItem(
     notebook: Notebook,
     selectable: Boolean = false,
     selected: Boolean,
-    onSelected: (Int) -> Unit,
+    onItemSelected: (Notebook) -> Unit,
     onItemClicked: (Notebook) -> Unit,
     onItemLongClicked: (Notebook) -> Unit = {},
     modifier: Modifier = Modifier,
@@ -228,7 +274,7 @@ fun NotebookItem(
                     indication = rememberRipple(),
                     onClick = {
                         if (selectable) {
-                            onSelected(notebook.id)
+                            onItemSelected(notebook)
                         } else {
                             onItemClicked(notebook)
                         }
@@ -352,6 +398,6 @@ fun NotebooksPreview() {
     }
 
     NotesTheme() {
-        Notebooks(notebooks) {}
+        Notebooks(notebooks, false, mutableSetOf(), {}, {}, {})
     }
 }
