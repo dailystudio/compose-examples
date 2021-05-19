@@ -1,5 +1,6 @@
 package com.dailystudio.compose.notebook.ui
 
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.foundation.*
 import androidx.compose.foundation.interaction.MutableInteractionSource
@@ -44,6 +45,15 @@ fun NotebooksPage(notebooks: List<Notebook>?,
         mutableStateMapOf<Int, Boolean>()
     }
 
+    val beginSelection = {
+        inSelectionMode = true
+    }
+
+    val endSelection = {
+        inSelectionMode = false
+        selectedItems.clear()
+    }
+
     var showMenu by remember { mutableStateOf(false) }
 
     var showAboutDialog by remember {
@@ -67,6 +77,13 @@ fun NotebooksPage(notebooks: List<Notebook>?,
                             R.string.prompt_selection,
                             selectedItems.size
                         ))
+                    },
+                    navigationIcon = {
+                        IconButton(onClick = {
+                            endSelection()
+                        }) {
+                            Icon(Icons.Default.Clear, "Back")
+                        }
                     },
                     actions = {
                         IconButton(onClick = {
@@ -114,10 +131,14 @@ fun NotebooksPage(notebooks: List<Notebook>?,
 
         },
         floatingActionButton = {
-            FloatingActionButton(onClick = {
-                showNewNoteDialog = true
-            }) {
-                Icon(Icons.Filled.Add, contentDescription = null)
+            AnimatedVisibility (!inSelectionMode) {
+                FloatingActionButton(
+                    modifier = Modifier.padding(8.dp),
+                    onClick = {
+                    showNewNoteDialog = true
+                }) {
+                    Icon(Icons.Filled.Add, contentDescription = null)
+                }
             }
         }
     
@@ -144,7 +165,7 @@ fun NotebooksPage(notebooks: List<Notebook>?,
 
             },
             onSelectionStarted = {
-                inSelectionMode = true
+                beginSelection()
                 selectedItems[it.id] = true
             }
         )
@@ -172,8 +193,7 @@ fun NotebooksPage(notebooks: List<Notebook>?,
 
             onRemoveNotebooks(selectedItems.keys.toSet())
 
-            selectedItems.clear()
-            inSelectionMode = false
+            endSelection()
         }
     }
 }

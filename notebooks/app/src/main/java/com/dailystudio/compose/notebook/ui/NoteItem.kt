@@ -1,5 +1,7 @@
 package com.dailystudio.compose.notebook.ui
 
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.clickable
@@ -11,6 +13,7 @@ import androidx.compose.foundation.lazy.*
 import androidx.compose.foundation.selection.selectable
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Clear
 import androidx.compose.material.icons.filled.Create
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.ripple.rememberRipple
@@ -31,6 +34,7 @@ import com.dailystudio.compose.notebook.theme.NotesTheme
 import com.dailystudio.devbricksx.development.Logger
 
 
+@ExperimentalAnimationApi
 @ExperimentalFoundationApi
 @Composable
 fun NotesPage(notebookId: Int,
@@ -48,6 +52,15 @@ fun NotesPage(notebookId: Int,
         mutableStateMapOf<Int, Boolean>()
     }
 
+    val beginSelection = {
+        inSelectionMode = true
+    }
+
+    val endSelection = {
+        inSelectionMode = false
+        selectedItems.clear()
+    }
+
     var showDeletionConfirmDialog by remember {
         mutableStateOf(false)
     }
@@ -60,6 +73,13 @@ fun NotesPage(notebookId: Int,
                         Text(text = stringResource(
                             R.string.prompt_selection,
                             selectedItems.size))
+                    },
+                    navigationIcon = {
+                        IconButton(onClick = {
+                            endSelection()
+                        }) {
+                            Icon(Icons.Default.Clear, "Back")
+                        }
                     },
                     actions = {
                         IconButton(onClick = {
@@ -79,12 +99,15 @@ fun NotesPage(notebookId: Int,
             }
         },
         floatingActionButton = {
-            FloatingActionButton(
-                onClick = {
-                    onNewNote()
+            AnimatedVisibility(!inSelectionMode) {
+                FloatingActionButton(
+                    modifier = Modifier.padding(8.dp),
+                    onClick = {
+                        onNewNote()
+                    }
+                ) {
+                    Icon(Icons.Filled.Create, contentDescription = null)
                 }
-            ) {
-                Icon(Icons.Filled.Create, contentDescription = null)
             }
         },
     ) {
@@ -105,7 +128,7 @@ fun NotesPage(notebookId: Int,
                 Logger.debug("after selected: $selectedItems")
             },
             onSelectionStarted = {
-                inSelectionMode = true
+                beginSelection()
                 selectedItems[it.id] = true
             }
         )
@@ -117,8 +140,7 @@ fun NotesPage(notebookId: Int,
 
             onRemoveNotes(selectedItems.keys.toSet())
 
-            selectedItems.clear()
-            inSelectionMode = false
+            endSelection()
         }
 
     }
