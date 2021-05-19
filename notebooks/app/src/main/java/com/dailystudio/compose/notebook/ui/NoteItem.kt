@@ -48,6 +48,10 @@ fun NotesPage(notebookId: Int,
         mutableStateMapOf<Int, Boolean>()
     }
 
+    var showDeletionConfirmDialog by remember {
+        mutableStateOf(false)
+    }
+
     Scaffold(
         topBar = {
             if (inSelectionMode) {
@@ -55,16 +59,11 @@ fun NotesPage(notebookId: Int,
                     title = {
                         Text(text = stringResource(
                             R.string.prompt_selection,
-                            selectedItems.size
-                        )
-                        )
+                            selectedItems.size))
                     },
                     actions = {
                         IconButton(onClick = {
-                            onRemoveNotes(selectedItems.keys.toSet())
-
-                            selectedItems.clear()
-                            inSelectionMode = false
+                            showDeletionConfirmDialog = true
                         }) {
                             Icon(Icons.Default.Delete, "Delete")
                         }
@@ -110,6 +109,18 @@ fun NotesPage(notebookId: Int,
                 selectedItems[it.id] = true
             }
         )
+
+        DeletionConfirmDialog(
+            showDialog = showDeletionConfirmDialog,
+            onCancel = { showDeletionConfirmDialog = false }) {
+            showDeletionConfirmDialog = false
+
+            onRemoveNotes(selectedItems.keys.toSet())
+
+            selectedItems.clear()
+            inSelectionMode = false
+        }
+
     }
 }
 

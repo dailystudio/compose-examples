@@ -54,6 +54,10 @@ fun NotebooksPage(notebooks: List<Notebook>?,
         mutableStateOf(false)
     }
 
+    var showDeletionConfirmDialog by remember {
+        mutableStateOf(false)
+    }
+
     Scaffold(
         topBar = {
             if (inSelectionMode) {
@@ -66,10 +70,7 @@ fun NotebooksPage(notebooks: List<Notebook>?,
                     },
                     actions = {
                         IconButton(onClick = {
-                            onRemoveNotebooks(selectedItems.keys.toSet())
-
-                            selectedItems.clear()
-                            inSelectionMode = false
+                            showDeletionConfirmDialog = true
                         }) {
                             Icon(Icons.Default.Delete, "Delete")
                         }
@@ -163,6 +164,17 @@ fun NotebooksPage(notebooks: List<Notebook>?,
                 onNewNotebook(newNotebook)
             }
         )
+
+        DeletionConfirmDialog(
+            showDialog = showDeletionConfirmDialog,
+            onCancel = { showDeletionConfirmDialog = false }) {
+            showDeletionConfirmDialog = false
+
+            onRemoveNotebooks(selectedItems.keys.toSet())
+
+            selectedItems.clear()
+            inSelectionMode = false
+        }
     }
 }
 
@@ -199,49 +211,6 @@ fun Notebooks(notebooks: List<Notebook>?,
                     onItemClicked = onOpenNotebook)
             }
         }
-    }
-}
-
-@Composable
-fun NewNotebookDialog(showDialog: Boolean,
-                      onCancel: () -> Unit,
-                      onNewNotebook: (String) -> Unit
-) {
-    var notebookName by remember {
-        mutableStateOf("")
-    }
-
-    if (showDialog) {
-        AlertDialog(
-            onDismissRequest = {
-            },
-
-            title = {
-                Text(text = stringResource(id = R.string.dialog_title_new_notebook))
-            },
-            text = {
-                TextField(value = notebookName,
-                    onValueChange = {
-                        notebookName = it
-                    }
-                )
-            },
-            dismissButton = {
-                Button(onClick = {
-                    onCancel()
-                }) {
-                    Text(stringResource(id = android.R.string.cancel))
-                }
-            },
-            confirmButton = {
-                Button(onClick = {
-                    onNewNotebook(notebookName)
-                    notebookName = ""
-                }) {
-                    Text(stringResource(id = android.R.string.ok))
-                }
-            }
-        )
     }
 }
 
