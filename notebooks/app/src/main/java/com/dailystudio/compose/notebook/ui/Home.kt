@@ -22,10 +22,8 @@ fun Home() {
     val notes by notebookViewModel.notesInOpenedNotebook.collectAsState(initial = null)
     val note by notebookViewModel.currentNote.observeAsState(Note.createNote(-1))
 
-    navController.addOnDestinationChangedListener { _, _, arguments ->
-        val dest = arguments?.getString(KEY_ROUTE)
-
-        dest?.let {
+    navController.addOnDestinationChangedListener { _, destination, arguments ->
+        destination.navigatorName.let {
             if (it.startsWith("notebooks")) {
                 notebookViewModel.closeNotebook()
             } else if (it.startsWith("notes")) {

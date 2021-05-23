@@ -37,6 +37,7 @@ fun NoteEditScreen(note: Note,
                         imageVector = Icons.Rounded.Check,
                         contentDescription = null,
                         modifier = Modifier
+                            .padding(8.dp)
                             .clip(CircleShape)
                             .clickable {
                                 val updatedNote = Note.copyNote(note).apply {
@@ -48,6 +49,7 @@ fun NoteEditScreen(note: Note,
                                 onEditCompleted(updatedNote)
                             }
                             .padding(8.dp)
+
                     )
                 }
             )
@@ -74,13 +76,19 @@ fun NoteEdit(title: String?,
     Logger.debug("edit title: $title")
     Logger.debug("edit content: $content")
 
-    Column(modifier) {
+    Column(modifier.padding(16.dp)) {
         TextField(
             value = title ?: "",
             onValueChange = onTitleChanged,
             placeholder = {
                 Text(stringResource(id = R.string.hint_title))
             },
+            colors = TextFieldDefaults.textFieldColors(
+                backgroundColor = Color.Transparent,
+                focusedIndicatorColor = Color.Transparent,
+                unfocusedIndicatorColor = Color.Transparent
+            ),
+            textStyle = MaterialTheme.typography.h6,
             modifier = Modifier.fillMaxWidth()
         )
 
@@ -92,6 +100,12 @@ fun NoteEdit(title: String?,
             placeholder = {
                 Text(stringResource(id = R.string.hint_content))
             },
+            colors = TextFieldDefaults.textFieldColors(
+                backgroundColor = Color.Transparent,
+                focusedIndicatorColor = Color.Transparent,
+                unfocusedIndicatorColor = Color.Transparent
+            ),
+            textStyle = MaterialTheme.typography.subtitle2,
             modifier = Modifier
                 .fillMaxSize()
         )
