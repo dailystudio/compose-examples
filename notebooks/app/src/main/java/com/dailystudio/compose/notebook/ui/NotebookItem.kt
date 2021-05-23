@@ -26,13 +26,14 @@ import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.constraintlayout.compose.Dimension
 import com.dailystudio.compose.notebook.R
 import com.dailystudio.compose.notebook.db.Notebook
+import com.dailystudio.compose.notebook.db.NotebookInfo
 import com.dailystudio.compose.notebook.theme.NotesTheme
 import com.dailystudio.devbricksx.development.Logger
 
 @ExperimentalFoundationApi
 @ExperimentalAnimationApi
 @Composable
-fun NotebooksPage(notebooks: List<Notebook>?,
+fun NotebooksPage(notebooks: List<NotebookInfo>?,
                   onOpenNotebook: (Notebook) -> Unit,
                   onNewNotebook: (Notebook) -> Unit,
                   onRemoveNotebooks: (Set<Int>) -> Unit,
@@ -200,7 +201,7 @@ fun NotebooksPage(notebooks: List<Notebook>?,
 
 @ExperimentalFoundationApi
 @Composable
-fun Notebooks(notebooks: List<Notebook>?,
+fun Notebooks(notebooks: List<NotebookInfo>?,
               selectable: Boolean,
               selectedItems: Set<Int>,
               onOpenNotebook: (Notebook) -> Unit,
@@ -238,7 +239,7 @@ fun Notebooks(notebooks: List<Notebook>?,
 @ExperimentalFoundationApi
 @Composable
 fun NotebookItem(
-    notebook: Notebook,
+    notebook: NotebookInfo,
     selectable: Boolean = false,
     selected: Boolean,
     onItemSelected: (Notebook) -> Unit,
@@ -343,7 +344,7 @@ fun NotebookItem(
 @ExperimentalFoundationApi
 @Composable
 fun NotebookItemPreview() {
-    val notebook = Notebook.createNoteBook("Notebook").apply {
+    val notebook = NotebookInfo.createNoteBookInfo("Notebook").apply {
         notesCount = 10
     }
 
@@ -356,7 +357,7 @@ fun NotebookItemPreview() {
 @ExperimentalFoundationApi
 @Composable
 fun SelectedNotebookItemPreview() {
-    val notebook = Notebook.createNoteBook("Notebook").apply {
+    val notebook = NotebookInfo.createNoteBookInfo("Notebook").apply {
         notesCount = 10
     }
 
@@ -369,7 +370,7 @@ fun SelectedNotebookItemPreview() {
 @ExperimentalFoundationApi
 @Composable
 fun EmptyNotebookItemPreview() {
-    val notebook = Notebook.createNoteBook("Empty")
+    val notebook = NotebookInfo.createNoteBookInfo("Empty")
 
     NotesTheme() {
         NotebookItem(notebook, selectable = true, selected = false, {}, {}, {})
@@ -380,10 +381,10 @@ fun EmptyNotebookItemPreview() {
 @ExperimentalFoundationApi
 @Composable
 fun NotebooksPreview() {
-    val notebooks = mutableListOf<Notebook>()
+    val notebooks = mutableListOf<NotebookInfo>()
 
     for (i in 0 until 100) {
-        notebooks.add(Notebook.createNoteBook("Notebook $i"))
+        notebooks.add(NotebookInfo.createNoteBookInfo("Notebook $i"))
     }
 
     NotesTheme() {

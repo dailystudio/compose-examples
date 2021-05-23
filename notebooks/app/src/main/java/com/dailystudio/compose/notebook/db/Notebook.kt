@@ -1,10 +1,9 @@
 package com.dailystudio.compose.notebook.db
 
 import androidx.room.ForeignKey
-import androidx.room.Ignore
 import com.dailystudio.devbricksx.annotations.*
 import com.dailystudio.devbricksx.database.DateConverter
-import com.dailystudio.devbricksx.database.SelectableRecord
+import com.dailystudio.devbricksx.database.Record
 import java.util.*
 
 @RoomCompanion(primaryKeys = ["id"],
@@ -14,7 +13,7 @@ import java.util.*
     database = "notes",
 )
 @ViewModel(group = "notebook")
-open class Notebook(id: Int = 0) : SelectableRecord(id) {
+open class Notebook(id: Int = 0) : Record(id) {
 
     companion object {
 
@@ -31,7 +30,6 @@ open class Notebook(id: Int = 0) : SelectableRecord(id) {
     }
 
     @JvmField var name: String? = null
-    @Ignore var notesCount: Int = 0
 
     override fun toString(): String {
         return buildString {
@@ -39,6 +37,26 @@ open class Notebook(id: Int = 0) : SelectableRecord(id) {
         }
     }
 }
+
+class NotebookInfo(id: Int = 0): Notebook(id) {
+
+    companion object {
+
+        fun createNoteBookInfo(name: String): NotebookInfo {
+            return NotebookInfo(0).apply {
+                val now = System.currentTimeMillis()
+
+                this.name = name
+                this.created = Date(now)
+                this.lastModified = this.created
+            }
+        }
+
+    }
+
+    var notesCount: Int = 0
+}
+
 
 @RoomCompanion(primaryKeys = ["id"],
     autoGenerate = true,
@@ -51,7 +69,7 @@ open class Notebook(id: Int = 0) : SelectableRecord(id) {
     )]
 )
 @ViewModel(group = "notebook")
-class Note(id: Int = 0) : SelectableRecord(id) {
+class Note(id: Int = 0) : Record(id) {
 
     companion object {
 
@@ -76,7 +94,6 @@ class Note(id: Int = 0) : SelectableRecord(id) {
                 desc = note.desc
                 created = note.created
                 lastModified = note.lastModified
-                selected = note.selected
             }
         }
 

@@ -24,19 +24,6 @@ class NotebookViewModelExt(application: Application): NotebookViewModel(applicat
         MutableLiveData(Note.createNote())
 
     val allNotebooks = getAllNotebooksOrderedByLastModified()
-                .mapLatest { notebooks ->
-                    val wrapper = mutableListOf<Notebook>()
-
-                    for (notebook in notebooks) {
-                        Logger.debug("queried notebook: $notebook")
-                        notebook.notesCount = countNotes(notebook.id)
-                        Logger.debug("nc: ${notebook.notesCount} of $notebook")
-
-                        wrapper.add(notebook)
-                    }
-
-                    wrapper.toList()
-                }.flowOn(Dispatchers.IO)
 
     val currentNote: LiveData<Note> = _currentNote
 
