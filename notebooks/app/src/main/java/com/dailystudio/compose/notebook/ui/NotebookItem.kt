@@ -30,6 +30,7 @@ import com.dailystudio.compose.notebook.db.NotebookInfo
 import com.dailystudio.compose.notebook.theme.NotesTheme
 import com.dailystudio.devbricksx.development.Logger
 
+
 @ExperimentalFoundationApi
 @ExperimentalAnimationApi
 @Composable
@@ -38,6 +39,7 @@ fun NotebooksPage(notebooks: List<NotebookInfo>?,
                   onNewNotebook: (Notebook) -> Unit,
                   onRemoveNotebooks: (Set<Int>) -> Unit,
 ) {
+
     var inSelectionMode by remember {
         mutableStateOf(false)
     }
@@ -144,7 +146,10 @@ fun NotebooksPage(notebooks: List<NotebookInfo>?,
         }
     
     ) {
-        Logger.debug("recomposition: selectable $inSelectionMode")
+        BackPressHandler(inSelectionMode) {
+            endSelection()
+        }
+
         Notebooks(notebooks = notebooks,
             selectable = inSelectionMode,
             selectedItems = selectedItems.keys,

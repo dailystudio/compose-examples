@@ -111,6 +111,10 @@ fun NotesPage(notebookId: Int,
             }
         },
     ) {
+        BackPressHandler(inSelectionMode) {
+            endSelection()
+        }
+
         Notes(notes = notes,
             selectable = inSelectionMode,
             selectedItems = selectedItems.keys,
