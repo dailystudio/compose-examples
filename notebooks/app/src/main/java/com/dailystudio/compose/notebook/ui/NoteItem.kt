@@ -1,7 +1,6 @@
 package com.dailystudio.compose.notebook.ui
 
-import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.ExperimentalAnimationApi
+import androidx.compose.animation.*
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.clickable
@@ -32,6 +31,7 @@ import com.dailystudio.compose.notebook.R
 import com.dailystudio.compose.notebook.db.Note
 import com.dailystudio.compose.notebook.theme.NotesTheme
 import com.dailystudio.devbricksx.development.Logger
+import kotlin.math.roundToInt
 
 
 @ExperimentalAnimationApi
@@ -99,7 +99,10 @@ fun NotesPage(notebookId: Int,
             }
         },
         floatingActionButton = {
-            AnimatedVisibility(!inSelectionMode) {
+            AnimatedVisibility(!inSelectionMode,
+                enter = slideInHorizontally(initialOffsetX = {it}),
+                exit = slideOutHorizontally(targetOffsetX = { (it * 1.2).roundToInt()})
+            ) {
                 FloatingActionButton(
                     modifier = Modifier.padding(8.dp),
                     onClick = {
