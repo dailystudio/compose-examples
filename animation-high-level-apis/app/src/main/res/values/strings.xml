@@ -1,6 +1,7 @@
 <resources>
     <string name="app_name_release">Animations</string>
     <string name="app_name_debug">@string/app_name_release</string>
-    <string name="label_demo_page_a">This is a demo page with some text on it.</string>
-    <string name="label_demo_page_b">This is a demo page with an image. Click on the image to increase its size</string>
+    <string name="label_demo_page_a">To read more, click on the text.</string>
+    <string name="label_demo_page_b">Click on the image to increase its size.</string>
+    <string name="article">Jetpack Compose is a modern declarative UI Toolkit for Android. Compose makes it easier to write and maintain your app UI by providing a declarative API that allows you to render your app UI without imperatively mutating frontend views. This terminology needs some explanation, but the implications are important for your app design.</string>
 </resources>
