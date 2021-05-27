@@ -1,0 +1,6 @@
+<resources>
+    <string name="app_name_release">Animations</string>
+    <string name="app_name_debug">@string/app_name_release</string>
+    <string name="label_demo_page_a">This is a demo page with some text on it.</string>
+    <string name="label_demo_page_b">This is a demo page with an image. Click on the image to increase its size</string>
+</resources>
