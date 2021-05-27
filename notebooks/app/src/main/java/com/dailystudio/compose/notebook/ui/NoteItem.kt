@@ -44,6 +44,13 @@ fun NotesPage(notebookId: Int,
               onNewNote: () -> Unit,
               onRemoveNotes: (Set<Int>) -> Unit,
 ) {
+    var fabVisible by remember {
+        mutableStateOf(false)
+    }
+
+    LaunchedEffect(key1 = true) {
+        fabVisible = true
+    }
     var inSelectionMode by remember {
         mutableStateOf(false)
     }
@@ -54,10 +61,12 @@ fun NotesPage(notebookId: Int,
 
     val beginSelection = {
         inSelectionMode = true
+        fabVisible = false
     }
 
     val endSelection = {
         inSelectionMode = false
+        fabVisible = true
         selectedItems.clear()
     }
 
@@ -99,7 +108,7 @@ fun NotesPage(notebookId: Int,
             }
         },
         floatingActionButton = {
-            AnimatedVisibility(!inSelectionMode,
+            AnimatedVisibility(fabVisible,
                 enter = slideInHorizontally(initialOffsetX = {it}),
                 exit = slideOutHorizontally(targetOffsetX = { (it * 1.2).roundToInt()})
             ) {

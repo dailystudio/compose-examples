@@ -31,6 +31,7 @@ import com.dailystudio.compose.notebook.db.Notebook
 import com.dailystudio.compose.notebook.db.NotebookInfo
 import com.dailystudio.compose.notebook.theme.NotesTheme
 import com.dailystudio.devbricksx.development.Logger
+import kotlinx.coroutines.delay
 import kotlin.math.roundToInt
 
 
@@ -42,6 +43,13 @@ fun NotebooksPage(notebooks: List<NotebookInfo>?,
                   onNewNotebook: (Notebook) -> Unit,
                   onRemoveNotebooks: (Set<Int>) -> Unit,
 ) {
+    var fabVisible by remember {
+        mutableStateOf(false)
+    }
+
+    LaunchedEffect(key1 = true) {
+        fabVisible = true
+    }
 
     var inSelectionMode by remember {
         mutableStateOf(false)
@@ -53,10 +61,12 @@ fun NotebooksPage(notebooks: List<NotebookInfo>?,
 
     val beginSelection = {
         inSelectionMode = true
+        fabVisible = false
     }
 
     val endSelection = {
         inSelectionMode = false
+        fabVisible = true
         selectedItems.clear()
     }
 
@@ -137,7 +147,7 @@ fun NotebooksPage(notebooks: List<NotebookInfo>?,
 
         },
         floatingActionButton = {
-            AnimatedVisibility (!inSelectionMode,
+            AnimatedVisibility (fabVisible,
                 enter = slideInVertically(initialOffsetY = {it}),
                 exit = slideOutVertically(targetOffsetY = { (it * 1.2).roundToInt()})
             ) {
