@@ -1,3 +1,4 @@
 <resources>
-    <string name="app_name">Recomposition</string>
+    <string name="app_name_release">Recomposition</string>
+    <string name="app_name_debug">@string/app_name_release</string>
 </resources>
