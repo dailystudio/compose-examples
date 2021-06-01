@@ -32,7 +32,7 @@ class MainActivity : AppCompatActivity() {
             }
         }
 
-        createSampleNotes(true)
+//        createSampleNotes(true)
     }
 
     private fun createSampleNotes(cleanUp: Boolean) {

@@ -18,9 +18,11 @@ import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.ripple.rememberRipple
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
@@ -233,7 +235,7 @@ fun NoteItem(note: Note,
                 }
             )
             .fillMaxWidth()
-            .height(120.dp)
+            .height(180.dp)
         ) {
             val (content, indicator) = createRefs()
 
@@ -252,10 +254,14 @@ fun NoteItem(note: Note,
             ) {
                 Text(
                     text = note.title ?: "",
+                    maxLines = 1,
                     style = MaterialTheme.typography.h6.copy(
-                        textAlign = TextAlign.Left
+                        textAlign = TextAlign.Left,
+                        fontWeight = FontWeight.Bold
                     ),
                 )
+                
+                Spacer(modifier = Modifier.height(8.dp))
 
                 Text(
                     text = note.desc ?: "Empty",
