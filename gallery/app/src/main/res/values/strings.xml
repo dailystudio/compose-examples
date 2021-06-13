@@ -1,0 +1,4 @@
+<resources>
+    <string name="app_name_release">Gallery</string>
+    <string name="app_name_debug">@string/app_name_release</string>
+</resources>
