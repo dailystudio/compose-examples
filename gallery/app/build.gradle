@@ -94,7 +94,8 @@ dependencies {
     implementation "com.github.Rasalexman:KDispatcher:${project.ext.kdispatcherVersion}"
     implementation "com.squareup.retrofit2:retrofit:${project.ext.retrofitVersion}"
     implementation "com.squareup.retrofit2:converter-gson:${project.ext.retrofitVersion}"
-    implementation("io.coil-kt:coil:${project.ext.coilVersion}")
+    implementation "io.coil-kt:coil:${project.ext.coilVersion}"
+    implementation "com.google.accompanist:accompanist-coil:${project.ext.coilComposeVersion}"
 
     implementation "cn.dailystudio:devbricksx:${project.ext.devbricksxVersion}"
     implementation "cn.dailystudio:devbricksx-java-annotations:${project.ext.devbricksxVersion}"
