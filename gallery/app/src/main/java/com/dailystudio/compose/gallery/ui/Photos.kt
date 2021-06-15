@@ -30,7 +30,6 @@ import com.google.accompanist.coil.rememberCoilPainter
 @ExperimentalFoundationApi
 @Composable
 fun Photos(photoItems: LazyPagingItems<PhotoItem>) {
-
     LazyVerticalGrid(
         cells = GridCells.Fixed(2)
     ) {

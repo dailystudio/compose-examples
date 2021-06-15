@@ -4,17 +4,17 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.ExperimentalFoundationApi
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Surface
-import androidx.compose.material.Text
+import androidx.compose.material.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.paging.ExperimentalPagingApi
 import androidx.paging.Pager
 import androidx.paging.PagingConfig
 import androidx.paging.PagingData
+import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.collectAsLazyPagingItems
 import com.dailystudio.compose.gallery.api.UnsplashApiInterface
 import com.dailystudio.compose.gallery.db.PhotoItem
@@ -40,10 +40,21 @@ class MainActivity : ComponentActivity() {
             }.flow.collectAsLazyPagingItems()
 
             GalleryTheme {
-                Surface(color = MaterialTheme.colors.background) {
-                    Photos(photos)
-                }
+                Home(photos)
             }
         }
+    }
+}
+
+
+@ExperimentalFoundationApi
+@Composable
+fun Home(photos: LazyPagingItems<PhotoItem>) {
+    Scaffold(topBar = {
+        TopAppBar(title = {
+            Text(text = stringResource(id = R.string.app_name))
+        })
+    }) {
+        Photos(photos)
     }
 }
