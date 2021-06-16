@@ -19,6 +19,8 @@ import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.TextRange
+import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.paging.ExperimentalPagingApi
@@ -54,9 +56,6 @@ fun Home() {
     }
 
     val photos = pager.flow.collectAsLazyPagingItems()
-
-    var queryInput by remember { mutableStateOf(viewModel.photoQuery.value) }
-
     var showMenu by remember { mutableStateOf(false) }
 
     var showAboutDialog by remember {
@@ -70,6 +69,17 @@ fun Home() {
     Scaffold(topBar = {
         val focusRequester = remember { FocusRequester() }
         val keyboardController = LocalSoftwareKeyboardController.current
+
+        val queryValue = queryOfPhotos ?: Constants.QUERY_ALL
+        val querySelectionIndex = queryValue.length
+        val queryInputState = remember {
+            mutableStateOf(
+                TextFieldValue(
+                    text = queryValue,
+                    selection = TextRange(querySelectionIndex)
+                )
+            )
+        }
 
         if (searchActivated) {
             TopAppBar(
@@ -85,8 +95,10 @@ fun Home() {
                 },
                 actions = {
                     TextField(
-                        value = queryInput ?: Constants.QUERY_ALL,
-                        onValueChange = { queryInput = it },
+                        value = queryInputState.value,
+                        onValueChange = {
+                            queryInputState.value = it
+                        },
                         placeholder = {
                             Text(
                                 text = stringResource(id = R.string.hint_title),
@@ -105,7 +117,11 @@ fun Home() {
                         keyboardOptions = KeyboardOptions(imeAction = androidx.compose.ui.text.input.ImeAction.Search),
                         keyboardActions = KeyboardActions(
                             onSearch = {
-                                viewModel.searchPhotos(queryInput ?: Constants.QUERY_ALL)
+                                var newQuery = queryInputState.value.text
+                                if (newQuery.isNullOrBlank()) {
+                                    newQuery = Constants.QUERY_ALL
+                                }
+                                viewModel.searchPhotos(newQuery)
                                 keyboardController?.hide()
                                 searchActivated = false
                             }

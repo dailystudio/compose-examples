@@ -34,8 +34,6 @@ import com.google.accompanist.coil.rememberCoilPainter
 fun Photos(photoItems: LazyPagingItems<PhotoItem>) {
     val listState = rememberLazyListState()
 
-    Logger.debug("photos recompose: $photoItems")
-
     LazyVerticalGrid(
         cells = GridCells.Fixed(2),
         state = listState
