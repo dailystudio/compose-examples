@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.GridCells
 import androidx.compose.foundation.lazy.LazyVerticalGrid
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CornerSize
 import androidx.compose.material.Card
 import androidx.compose.material.MaterialTheme
@@ -25,13 +26,19 @@ import androidx.compose.ui.unit.dp
 import androidx.paging.compose.LazyPagingItems
 import coil.size.Scale
 import com.dailystudio.compose.gallery.db.PhotoItem
+import com.dailystudio.devbricksx.development.Logger
 import com.google.accompanist.coil.rememberCoilPainter
 
 @ExperimentalFoundationApi
 @Composable
 fun Photos(photoItems: LazyPagingItems<PhotoItem>) {
+    val listState = rememberLazyListState()
+
+    Logger.debug("photos recompose: $photoItems")
+
     LazyVerticalGrid(
-        cells = GridCells.Fixed(2)
+        cells = GridCells.Fixed(2),
+        state = listState
     ) {
         items(photoItems.itemCount) { index ->
             val p = photoItems.getAsState(index = index).value ?: return@items
