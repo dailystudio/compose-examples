@@ -17,7 +17,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.input.TextFieldValue
@@ -72,14 +74,19 @@ fun Home() {
 
         val queryValue = queryOfPhotos ?: Constants.QUERY_ALL
         val querySelectionIndex = queryValue.length
-        val queryInputState = remember {
-            mutableStateOf(
-                TextFieldValue(
-                    text = queryValue,
-                    selection = TextRange(querySelectionIndex)
-                )
+        Logger.debug("queryValue recompose: $queryValue")
+
+        val queryInputState = mutableStateOf(
+            TextFieldValue(
+                text = if (queryValue == Constants.QUERY_ALL) {
+                    ""
+                } else {
+                    queryValue
+                },
+                selection = TextRange(querySelectionIndex)
             )
-        }
+        )
+
 
         if (searchActivated) {
             TopAppBar(
@@ -118,7 +125,7 @@ fun Home() {
                         keyboardActions = KeyboardActions(
                             onSearch = {
                                 var newQuery = queryInputState.value.text
-                                if (newQuery.isNullOrBlank()) {
+                                if (newQuery.isBlank()) {
                                     newQuery = Constants.QUERY_ALL
                                 }
                                 viewModel.searchPhotos(newQuery)
@@ -133,6 +140,7 @@ fun Home() {
                         focusRequester.requestFocus()
                         onDispose { }
                     }
+/*
 
                     IconButton(onClick = {
                         showMenu = true
@@ -140,6 +148,7 @@ fun Home() {
                         Icon(Icons.Default.MoreVert, "More actions")
                     }
 
+*/
                 }
             )
         } else {
@@ -152,6 +161,16 @@ fun Home() {
                         searchActivated = true
                     }) {
                         Icon(Icons.Default.Search, "Search")
+                    }
+
+                    if (queryOfPhotos != Constants.QUERY_ALL) {
+                        Chip(
+                            label = queryInputState.value.text,
+                            icon = painterResource(id = R.drawable.ic_remove_search)
+                        ) {
+                            Logger.debug("clear search")
+                            viewModel.searchPhotos(Constants.QUERY_ALL)
+                        }
                     }
 
                     IconButton(onClick = {
