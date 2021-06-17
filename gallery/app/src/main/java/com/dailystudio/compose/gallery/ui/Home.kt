@@ -2,6 +2,7 @@ package com.dailystudio.compose.gallery.ui
 
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.text.KeyboardActions
@@ -16,13 +17,21 @@ import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.layout.onGloballyPositioned
+import androidx.compose.ui.layout.positionInParent
+import androidx.compose.ui.layout.positionInRoot
+import androidx.compose.ui.layout.positionInWindow
+import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.input.TextFieldValue
+import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.paging.ExperimentalPagingApi
@@ -90,7 +99,9 @@ fun Home() {
 
         if (searchActivated) {
             TopAppBar(
-                title = {},
+                title = {
+//                    Text(text = stringResource(id = R.string.app_name))
+                },
                 navigationIcon = {
                     if (searchActivated) {
                         IconButton(onClick = {
@@ -101,6 +112,7 @@ fun Home() {
                     }
                 },
                 actions = {
+                    var xOffsetOfSearchInPx = 0f
                     TextField(
                         value = queryInputState.value,
                         onValueChange = {
@@ -134,13 +146,16 @@ fun Home() {
                             }
                         ),
                         modifier = Modifier.focusRequester(focusRequester)
+                            .fillMaxWidth(.8f)
+                            .onGloballyPositioned {
+                                xOffsetOfSearchInPx = it.positionInRoot().x
+                            }
                     )
 
                     DisposableEffect(Unit) {
                         focusRequester.requestFocus()
                         onDispose { }
                     }
-/*
 
                     IconButton(onClick = {
                         showMenu = true
@@ -148,7 +163,25 @@ fun Home() {
                         Icon(Icons.Default.MoreVert, "More actions")
                     }
 
-*/
+                    val density = LocalDensity.current.density
+                    var marginToEndOfScreenInPx = with(LocalDensity.current) {
+                        (LocalConfiguration.current.screenWidthDp.dp.roundToPx() - xOffsetOfSearchInPx)
+                    }
+
+                    OptionMenus(modifier = Modifier.onGloballyPositioned {
+                            marginToEndOfScreenInPx -= it.size.width
+                        },
+                        menuOffset = DpOffset(
+                            (marginToEndOfScreenInPx / density).dp,
+                            0.dp
+                        ),
+                        showMenu = showMenu,
+                        onMenuDismissed = { showMenu = false }) {
+                        when(it) {
+                            MENU_ITEM_ID_ABOUT -> showAboutDialog = true
+                        }
+                    }
+
                 }
             )
         } else {
@@ -157,9 +190,15 @@ fun Home() {
                     Text(text = stringResource(id = R.string.app_name))
                 },
                 actions = {
-                    IconButton(onClick = {
-                        searchActivated = true
-                    }) {
+                    var xOffsetOfSearchInPx = 0f
+                    IconButton(
+                        onClick = {
+                            searchActivated = true
+                        },
+                        modifier = Modifier.onGloballyPositioned {
+                            xOffsetOfSearchInPx = it.positionInRoot().x
+                        }
+                    ) {
                         Icon(Icons.Default.Search, "Search")
                     }
 
@@ -179,7 +218,19 @@ fun Home() {
                         Icon(Icons.Default.MoreVert, "More actions")
                     }
 
-                    OptionMenus(showMenu = showMenu,
+                    val density = LocalDensity.current.density
+                    var marginToEndOfScreenInPx = with(LocalDensity.current) {
+                        (LocalConfiguration.current.screenWidthDp.dp.roundToPx() - xOffsetOfSearchInPx)
+                    }
+
+                    OptionMenus(modifier = Modifier.onGloballyPositioned {
+                        marginToEndOfScreenInPx -= it.size.width
+                    },
+                        menuOffset = DpOffset(
+                            (marginToEndOfScreenInPx / density).dp,
+                            0.dp
+                        ),
+                        showMenu = showMenu,
                         onMenuDismissed = { showMenu = false }) {
                         when(it) {
                             MENU_ITEM_ID_ABOUT -> showAboutDialog = true
@@ -195,18 +246,21 @@ fun Home() {
         AboutDialog(showDialog = showAboutDialog) {
             showAboutDialog = false
         }
-
     }
 }
 
 @Composable
-fun OptionMenus(showMenu: Boolean,
+fun OptionMenus(modifier: Modifier = Modifier,
+                showMenu: Boolean,
+                menuOffset: DpOffset = DpOffset.Zero,
                 onMenuDismissed: () -> Unit,
                 onMenuItemClick: (Int) -> Unit
 ) {
     DropdownMenu(
+        modifier = modifier,
+        offset = menuOffset,
         expanded = showMenu,
-        onDismissRequest = onMenuDismissed
+        onDismissRequest = onMenuDismissed,
     ) {
         DropdownMenuItem(onClick = {
             onMenuItemClick(MENU_ITEM_ID_ABOUT)
